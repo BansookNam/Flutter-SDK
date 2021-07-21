@@ -43,6 +43,7 @@ android {
 }
 dependencies{
     compileOnly("com.moengage:moe-android-sdk:11.0.04")
+    compileOnly("com.google.firebase:firebase-messaging:19.0.1")
     api("com.moengage:plugin-base:2.0.00")
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }

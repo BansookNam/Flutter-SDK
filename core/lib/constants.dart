@@ -21,6 +21,7 @@ const String methodEnableSDKLogs = "enableSDKLogs";
 const String methodLogout = "logout";
 
 // Callback Names
+const String callbackOnMessage = "onMessage";
 const String callbackOnPushClick = "onPushClick";
 const String callbackOnInAppShown = "onInAppShown";
 const String callbackOnInAppClicked = "onInAppClick";

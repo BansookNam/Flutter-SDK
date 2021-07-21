@@ -13,6 +13,7 @@ import 'package:moengage_flutter/moe_ios_core.dart';
 import 'package:moengage_flutter/moe_android_core.dart';
 
 typedef void PushCallbackHandler(PushCampaign pushCampaign);
+typedef void MessagekHandler(String pushCampaign);
 typedef void InAppCallbackHandler(InAppCampaign inAppCampaign);
 
 class MoEngageFlutter {
@@ -21,6 +22,7 @@ class MoEngageFlutter {
   MoEiOSCore _moEiOS;
 
   PushCallbackHandler _onPushClick;
+  MessagekHandler _onMessage;
   InAppCallbackHandler _onInAppClick;
   InAppCallbackHandler _onInAppShown;
   InAppCallbackHandler _onInAppDismiss;
@@ -38,13 +40,13 @@ class MoEngageFlutter {
     _onPushClick = onPushClick;
   }
 
+  void setUpOnMessageCallback(MessagekHandler onMessage) {
+    _onMessage = onMessage;
+  }
+
   /// set up callback APIs for in-app events
   void setUpInAppCallbacks(
-      {InAppCallbackHandler onInAppClick,
-      InAppCallbackHandler onInAppShown,
-      InAppCallbackHandler onInAppDismiss,
-      InAppCallbackHandler onInAppCustomAction,
-      InAppCallbackHandler onInAppSelfHandle}) {
+      {InAppCallbackHandler onInAppClick, InAppCallbackHandler onInAppShown, InAppCallbackHandler onInAppDismiss, InAppCallbackHandler onInAppCustomAction, InAppCallbackHandler onInAppSelfHandle}) {
     _onInAppClick = onInAppClick;
     _onInAppShown = onInAppShown;
     _onInAppDismiss = onInAppDismiss;
@@ -59,6 +61,11 @@ class MoEngageFlutter {
         PushCampaign pushCampaign = pushCampaignFromJson(call.arguments);
         if (pushCampaign != null) {
           _onPushClick(pushCampaign);
+        }
+      }
+      if (call.method == callbackOnMessage && _onMessage != null) {
+        if (call.arguments != null) {
+          _onMessage(call.arguments);
         }
       }
       if (call.method == callbackOnInAppClicked && _onInAppClick != null) {
@@ -79,15 +86,13 @@ class MoEngageFlutter {
           _onInAppDismiss(inAppCampaign);
         }
       }
-      if (call.method == callbackOnInAppCustomAction &&
-          _onInAppCustomAction != null) {
+      if (call.method == callbackOnInAppCustomAction && _onInAppCustomAction != null) {
         InAppCampaign inAppCampaign = inAppCampaignFromJson(call.arguments);
         if (inAppCampaign != null) {
           _onInAppCustomAction(inAppCampaign);
         }
       }
-      if (call.method == callbackOnInAppSelfHandled &&
-          _onInAppSelfHandle != null) {
+      if (call.method == callbackOnInAppSelfHandled && _onInAppSelfHandle != null) {
         InAppCampaign inAppCampaign = inAppCampaignFromJson(call.arguments);
         if (inAppCampaign != null) {
           _onInAppSelfHandle(inAppCampaign);
@@ -213,18 +218,14 @@ class MoEngageFlutter {
       print("User Attribute Name cannot be empty");
       return;
     }
-    if (userAttributeValue is String ||
-        userAttributeValue is int ||
-        userAttributeValue is double ||
-        userAttributeValue is bool) {
+    if (userAttributeValue is String || userAttributeValue is int || userAttributeValue is double || userAttributeValue is bool) {
       if (Platform.isAndroid) {
         _moEAndroid.setUserAttribute(userAttributeName, userAttributeValue);
       } else if (Platform.isIOS) {
         _moEiOS.setUserAttribute(userAttributeName, userAttributeValue);
       }
     } else {
-      print(
-          "Only String, Numbers and Bool values supported as User Attributes");
+      print("Only String, Numbers and Bool values supported as User Attributes");
     }
   }
 
@@ -239,8 +240,7 @@ class MoEngageFlutter {
   }
 
   /// Tracks the given location as user attribute.
-  void setUserAttributeLocation(
-      String userAttributeName, MoEGeoLocation location) {
+  void setUserAttributeLocation(String userAttributeName, MoEGeoLocation location) {
     if (Platform.isAndroid) {
       _moEAndroid.setUserAttributeLocation(userAttributeName, location);
     } else if (Platform.isIOS) {

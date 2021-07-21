@@ -5,6 +5,9 @@ import android.os.Handler
 import android.os.Looper
 import com.moengage.core.internal.logger.Logger
 import com.moengage.plugin.base.PluginHelper
+import com.moengage.firebase.MoEFireBaseHelper
+import com.moengage.firebase.listener.FirebaseEventListener
+import com.google.firebase.messaging.RemoteMessage
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.FlutterPlugin.FlutterPluginBinding
 import io.flutter.plugin.common.BinaryMessenger
@@ -228,6 +231,12 @@ class MoEngageFlutterPlugin : FlutterPlugin, MethodCallHandler {
                 val plugin = MoEngageFlutterPlugin()
                 channel?.setMethodCallHandler(plugin)
                 pluginHelper.setEventCallback(EventEmitterImpl())
+
+                MoEFireBaseHelper.getInstance().addEventListener(object: FirebaseEventListener(){
+                    override fun onNonMoEngageMessageReceived(remoteMessage: RemoteMessage) {
+                        sendCallback("onMessage", remoteMessage.toString())
+                    }
+                })
             } catch (ex: Exception) {
                 Logger.e("$tag initPlugin() : exception : ", ex)
             }
